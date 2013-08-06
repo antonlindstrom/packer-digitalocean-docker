@@ -1,0 +1,22 @@
+{
+  "builders": [{
+    "type": "digitalocean",
+    "client_id": "YOUR_DIGITALOCEAN_CLIENT_ID",
+    "api_key": "YOUR_DIGITALOCEAN_API_KEY",
+    "image_id": 350076,
+    "snapshot_name": "docker-{{ .CreateTime }}"
+  }],
+  "provisioners": [{
+    "type": "shell",
+    "inline": [
+      "export DEBIAN_FRONTEND='noninteractive'",
+      "apt-get update -qq",
+      "apt-get -o Dpkg::Options::='--force-confdef' -o Dpkg::Options::='--force-confold' install -q -y linux-image-extra-`uname -r`",
+      "apt-get install -q -y software-properties-common",
+      "add-apt-repository -y ppa:dotcloud/lxc-docker",
+      "apt-get update -qq",
+      "apt-get install -q -y lxc-docker",
+      "sed -i -E 's|    /usr/bin/docker -d|    /usr/bin/docker -d -H 0.0.0.0|' /etc/init/docker.conf"
+    ]
+  }]
+}
